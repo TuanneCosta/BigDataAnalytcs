@@ -1,0 +1,417 @@
+---
+title: "monografia"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+ library(readr)
+  setwd("C:/Users/tuann/Documents/Monografia/Base De Dados/LoanStats_2019Q1.csv (1) (1)")
+
+```
+
+```{r}
+LoanStats_2019Q1 <- read_csv("LoanStats_2019Q1.csv", skip = 1 ,n_max = 115675 )
+```
+
+```{r}
+library (ggplot2)
+library(dplyr)
+library(tidyr)
+library (ggpubr)
+```
+
+```{r}
+summary(LoanStats_2019Q1)
+```
+```{r}
+LoanStats_2019Q1_2<- LoanStats_2019Q1[,-c(1,2)]
+```
+
+```{r}
+LoanStats_2019Q1$grade<-as.factor(LoanStats_2019Q1$grade)
+LoanStats_2019Q1$sub_grade<-as.factor(LoanStats_2019Q1$sub_grade)
+LoanStats_2019Q1$home_ownership<-as.factor(LoanStats_2019Q1$home_ownership)
+LoanStats_2019Q1$loan_status<-as.factor(LoanStats_2019Q1$loan_status)
+LoanStats_2019Q1$purpose<-as.factor(LoanStats_2019Q1$purpose)
+LoanStats_2019Q1$initial_list_status<-as.factor(LoanStats_2019Q1$initial_list_status)
+LoanStats_2019Q1$application_type<-as.factor(LoanStats_2019Q1$application_type)
+
+
+
+LoanStats_2019Q1$mths_since_last_delinq[is.na(LoanStats_2019Q1$mths_since_last_delinq)]<-0
+LoanStats_2019Q1$mths_since_last_record[is.na(LoanStats_2019Q1$mths_since_last_record)]<-0
+LoanStats_2019Q1$dti[is.na(LoanStats_2019Q1$dti)]<-0
+LoanStats_2019Q1$revol_util[is.na(LoanStats_2019Q1$revol_util)]<-0
+LoanStats_2019Q1$last_pymnt_d[is.na(LoanStats_2019Q1$last_pymnt_d)]<-0
+LoanStats_2019Q1$next_pymnt_d[is.na(LoanStats_2019Q1$next_pymnt_d)]<-0
+LoanStats_2019Q1$last_credit_pull_d[is.na(LoanStats_2019Q1$last_credit_pull_d)]<-0
+LoanStats_2019Q1$mths_since_last_major_derog[is.na(LoanStats_2019Q1$mths_since_last_major_derog)]<-0
+LoanStats_2019Q1$mths_since_rcnt_il[is.na(LoanStats_2019Q1$mths_since_rcnt_il)]<-0
+LoanStats_2019Q1$il_util[is.na(LoanStats_2019Q1$il_util)]<-0
+LoanStats_2019Q1$all_util[is.na(LoanStats_2019Q1$all_util)]<-0
+LoanStats_2019Q1$avg_cur_bal[is.na(LoanStats_2019Q1$avg_cur_bal)]<-0
+LoanStats_2019Q1$bc_open_to_buy[is.na(LoanStats_2019Q1$bc_open_to_buy)]<-0
+LoanStats_2019Q1$bc_util[is.na(LoanStats_2019Q1$bc_util)]<-0
+LoanStats_2019Q1$mo_sin_old_il_acct[is.na(LoanStats_2019Q1$mo_sin_old_il_acct)]<-0
+LoanStats_2019Q1$mths_since_recent_bc[is.na(LoanStats_2019Q1$mths_since_recent_bc)]<-0
+LoanStats_2019Q1$num_tl_120dpd_2m[is.na(LoanStats_2019Q1$num_tl_120dpd_2m)]<-0
+LoanStats_2019Q1$percent_bc_gt_75[is.na(LoanStats_2019Q1$percent_bc_gt_75)]<-0.0
+
+
+```
+
+```{r}
+LoanStats_2019Q1$emp_length<-as.factor(LoanStats_2019Q1$emp_length)
+LoanStats_2019Q1$issue_d<-as.factor(LoanStats_2019Q1$issue_d)
+LoanStats_2019Q1$title<-as.factor(LoanStats_2019Q1$title)
+LoanStats_2019Q1$initial_list_status<-as.factor(LoanStats_2019Q1$initial_list_status)
+LoanStats_2019Q1$last_pymnt_d<-as.factor(LoanStats_2019Q1$last_pymnt_d)
+LoanStats_2019Q1$next_pymnt_d<-as.factor(LoanStats_2019Q1$next_pymnt_d)
+LoanStats_2019Q1$last_credit_pull_d<-as.factor(LoanStats_2019Q1$last_credit_pull_d)
+LoanStats_2019Q1$application_type<-as.factor(LoanStats_2019Q1$application_type)
+LoanStats_2019Q1$verification_status_joint<-as.factor(LoanStats_2019Q1$verification_status_joint)
+
+```
+
+
+```{r}
+LoanStats_2019Q1$int_rate<-as.factor(LoanStats_2019Q1$int_rate)
+LoanStats_2019Q1$pymnt_plan<-as.factor(LoanStats_2019Q1$pymnt_plan)
+LoanStats_2019Q1$verification_status<-as.factor(LoanStats_2019Q1$verification_status)
+```
+```{r}
+str(LoanStats_2019Q1$term)
+```
+
+
+```{r}
+LoanStats_2019Q1<-mutate(LoanStats_2019Q1,term= ifelse(term == '60 months', 60, ifelse(term == '36 months', 36,"other")))
+LoanStats_2019Q1$term<- as.numeric(LoanStats_2019Q1$term)
+```
+
+
+
+```{r}
+LoanStats_2019Q1<-mutate(LoanStats_2019Q1,emp_length= ifelse(emp_length == '1 year', 1, ifelse(emp_length == '2 years', 2, ifelse(emp_length =='3 years', 3, ifelse(emp_length =='4 years', 4, ifelse( emp_length =='5 years', 5 , ifelse (emp_length =='6 years', 6 , ifelse(emp_length == '7 years', 7, ifelse (emp_length =='8 years', 8, ifelse( emp_length =='9 years', 9, ifelse(emp_length =='10 years', 10 , ifelse (emp_length =='10+ years', 11, ifelse (emp_length =='< 1 year', 1, ifelse(emp_length=='n/a', 0, "other"))))))))))))))
+LoanStats_2019Q1$emp_length<- as.numeric(LoanStats_2019Q1$emp_length)
+
+```
+
+
+```{r}
+LoanStats_2019Q1$mths_since_last_delinq[is.na(LoanStats_2019Q1$mths_since_last_delinq)]<-0
+LoanStats_2019Q1$mths_since_last_record[is.na(LoanStats_2019Q1$mths_since_last_record)]<-0
+LoanStats_2019Q1$dti[is.na(LoanStats_2019Q1$dti)]<-0
+LoanStats_2019Q1$revol_util[is.na(LoanStats_2019Q1$revol_util)]<-0
+LoanStats_2019Q1$last_pymnt_d[is.na(LoanStats_2019Q1$last_pymnt_d)]<-0
+LoanStats_2019Q1$next_pymnt_d[is.na(LoanStats_2019Q1$next_pymnt_d)]<-0
+LoanStats_2019Q1$last_credit_pull_d[is.na(LoanStats_2019Q1$last_credit_pull_d)]<-0
+LoanStats_2019Q1$mths_since_last_major_derog[is.na(LoanStats_2019Q1$mths_since_last_major_derog)]<-0
+LoanStats_2019Q1$mths_since_rcnt_il[is.na(LoanStats_2019Q1$mths_since_rcnt_il)]<-0
+LoanStats_2019Q1$il_util[is.na(LoanStats_2019Q1$il_util)]<-0
+LoanStats_2019Q1$all_util[is.na(LoanStats_2019Q1$all_util)]<-0
+LoanStats_2019Q1$avg_cur_bal[is.na(LoanStats_2019Q1$avg_cur_bal)]<-0
+LoanStats_2019Q1$bc_open_to_buy[is.na(LoanStats_2019Q1$bc_open_to_buy)]<-0
+LoanStats_2019Q1$bc_util[is.na(LoanStats_2019Q1$bc_util)]<-0
+LoanStats_2019Q1$mo_sin_old_il_acct[is.na(LoanStats_2019Q1$mo_sin_old_il_acct)]<-0
+LoanStats_2019Q1$mths_since_recent_bc[is.na(LoanStats_2019Q1$mths_since_recent_bc)]<-0
+LoanStats_2019Q1$num_tl_120dpd_2m[is.na(LoanStats_2019Q1$num_tl_120dpd_2m)]<-0
+LoanStats_2019Q1$percent_bc_gt_75[is.na(LoanStats_2019Q1$percent_bc_gt_75)]<-0.0
+```
+
+
+
+```{r}
+summary(LoanStats_2019Q1)
+```
+```{r}
+summary(LoanStats_2019Q1$grade)
+```
+
+
+```{r}
+
+grafico=ggplot(LoanStats_2019Q1,aes(LoanStats_2019Q1$term, fill=term ))
+grafico + geom_bar() + labs( title ="Frequência de Empréstimo por período", x="Período", y="frequência")+ labs_pubr() + theme_pubr()
+```
+
+```{r}
+table(LoanStats_2019Q1_2$term)
+```
+
+```{r}
+ggplot(data=LoanStats_2019Q1_2,aes(loan_amnt, col=term))+
+  geom_histogram(bins=40) + 
+  facet_grid(LoanStats_2019Q1_2$term ~ .) + labs_pubr() + theme_pubr()
+```
+
+```{r}
+
+ggplot(LoanStats_2019Q1, aes(x=home_ownership, y=loan_amnt, fill=home_ownership)) +
+  stat_summary(geom="bar") +
+  labs(y ="Total de valor de empréstimo", x="Tipo de Propriedade" , title="Total de Empréstimo por tipo de propriedade")+ labs_pubr() + theme_pubr()
+```
+
+```{r}
+ggplot(LoanStats_2019Q1, aes(x=purpose, y=loan_amnt, fill=home_ownership)) +
+  stat_summary(geom="bar") +
+  labs(y ="Total de valor de empréstimo", x="Propósito") + labs_pubr() + theme_pubr() + theme(axis.text.x = element_text(angle=90,vjust=1,size=10))
+```
+
+
+
+```{r}
+table(LoanStats_2019Q1$home_ownership)
+```
+
+
+```{r}
+ggplot(data=LoanStats_2019Q1, aes(grade,int_rate,fill=grade))+geom_boxplot(outlier.color = "blue")+labs(title="Box plot of Interest rate") + labs_pubr() + theme_pubr()
+```
+```{r}
+ggplot(data=LoanStats_2019Q1,aes(x=loan_status,y= loan_amnt))+
+  geom_boxplot() +
+  facet_grid(grade~.) + labs_pubr() + theme_pubr()
+```
+
+
+```{r}
+
+ggplot(data=LoanStats_2019Q1, aes(loan_status,loan_amnt,fill=loan_status))+ geom_boxplot(aes(x = LoanStats_2019Q1$loan_status, y = LoanStats_2019Q1$loan_amnt))+labs(title="Box plot do status do pagamento pelo total emprestado") + labs_pubr() + theme_pubr() + theme(axis.text.x = element_text(angle=90,vjust=1,size=10))
+```
+
+
+```{r}
+ggplot(LoanStats_2019Q1, aes(x = loan_amnt, y = installment, colour =grade)) + geom_point( size = 1)+labs(title="Gráfico de dispersão: Valor pago mensalmente por empréstimo e por grade") + labs_pubr() + theme_pubr()+
+geom_smooth()
+geom_jitter(
+    width = 0.1,
+    alpha = 0.5)
+```
+
+
+```{r}
+
+ggplot(LoanStats_2019Q1, aes(x = purpose, y = loan_amnt,axis.line=0.05 )) + geom_violin(colour="#9C9C9C", fill="#008B8B")+labs(title="Propósito de compra X Valor do empréstimo", x ="Próposito", y="Total do empréstimo") + labs_pubr() + theme_pubr() + theme(axis.text.x = element_text(angle=90,vjust=1,size=10))
+```
+
+```{r}
+ggplot(LoanStats_2019Q1, aes(x = purpose, y = loan_amnt,axis.line=0.05 )) + geom_vline(colour="#FF3030")+labs(title="Gráfico de dispersão: Valor pago mensalmente por empréstimo e por grade") + theme(axis.text.x = element_text(angle=90,vjust=1,size=10))
+
+```
+
+
+
+```{r}
+library(stringr)
+LoanStats_2019Q1<-mutate(LoanStats_2019Q1, int_rate5 =int_rate)
+#LoanStats_2019Q1$int_rate4<-mutate(LoanStats_2019Q1,int_rate4=str_replace_all(LoanStats_2019Q1$int_rate4, "[%]", ""))
+
+
+#LoanStats_2019Q1$int_rate<-str_replace_all(LoanStats_2019Q1$int_rate, "[%]","" )
+#LoanStats_2019Q1$int_rate<-as.double(LoanStats_2019Q1$int_rate)
+
+
+```
+
+```{r}
+
+LoanStats_2019Q1$int_rate<-round(LoanStats_2019Q1$int_rate)
+str(LoanStats_2019Q1$int_rate)
+```
+
+
+```{r}
+library(rpart)
+library(rpart.plot)
+arvore1<-rpart(grade ~ int_rate5, LoanStats_2019Q1 )
+```
+
+```{r}
+rpart.plot(arvore1,extra=2,fallen.leaves =FALSE)
+
+```
+
+```{r}
+LoanStats_2019Q1<-mutate(LoanStats_2019Q1,int_rate= ifelse(int_rate <=10 ,10,ifelse(int_rate>10 & int_rate<=14, 14,ifelse(int_rate>14 & int_rate<=18,18, ifelse(int_rate>18 & int_rate<=23, 23, 25)))))
+                                                            
+                             
+```
+
+##Cross Validation 
+```{r}
+#library(caret)
+#library(e1071)
+
+numFolds<- trainControl( method = "cv", number = 20)
+```
+
+```{r}
+library(randomForest)
+#cpGrid <- expand.grid(.cp = seq (0.01, 0.5, 0.0, 1))
+
+```
+
+```{r}
+dados <- sample(1:nrow(LoanStats_2019Q1_2),nrow(LoanStats_2019Q1_2)*0.7)
+
+train<- LoanStats_2019Q1_2[dados,] #70%
+
+teste <- LoanStats_2019Q1_2[-dados,] #30%
+```
+
+
+
+```{r}
+#cpGrid <- expand.grid(.cp = seq (0.01, 0.5, 0.0))
+
+train(grade ~ int_rate+loan_amnt+installment+term+funded_amnt_inv+funded_amnt+annual_inc+loan_status+issue_d+dti+open_acc+revol_bal+total_acc+out_prncp+out_prncp_inv+total_pymnt+total_pymnt_inv+total_rec_prncp+total_rec_int+last_pymnt_amnt+max_bal_bc+all_util+total_rev_hi_lim+total_bal_il+avg_cur_bal+bc_open_to_buy+bc_util+mo_sin_old_rev_tl_op+mths_since_recent_bc+num_actv_rev_tl+num_rev_accts+num_rev_tl_bal_gt_0+num_sats+percent_bc_gt_75+tot_hi_cred_lim+total_bal_ex_mort+total_bc_limit+total_il_high_credit_limit, data =train, method= "rpart", trControl = numFolds)
+```
+
+
+
+
+```{r}
+summary(treino$grade)
+```
+
+
+
+```{r}
+#lapply(treino, function(x) any(is.na(x)))
+
+```
+
+
+
+```{r}
+set.seed(123)
+modelFit <- randomForest(train$grade ~ loan_amnt+funded_amnt+funded_amnt_inv+term+int_rate+installment+emp_length+home_ownership+annual_inc+verification_status+issue_d+loan_status+purpose+title+dti+delinq_2yrs+inq_last_6mths+mths_since_last_delinq+mths_since_last_record+open_acc+pub_rec+revol_bal+total_acc+initial_list_status+out_prncp+out_prncp_inv+total_pymnt+total_pymnt_inv+total_rec_prncp+total_rec_int+total_rec_late_fee+recoveries+collection_recovery_fee+last_pymnt_d+last_pymnt_amnt+next_pymnt_d+last_credit_pull_d+collections_12_mths_ex_med+mths_since_last_major_derog+policy_code+application_type+acc_now_delinq+tot_coll_amt+tot_cur_bal+open_acc_6m+open_act_il+open_il_12m+open_il_24m+mths_since_rcnt_il+total_bal_il+il_util+open_rv_12m+open_rv_24m+max_bal_bc+all_util+total_rev_hi_lim+inq_fi+total_cu_tl+inq_last_12m+acc_open_past_24mths+avg_cur_bal+bc_open_to_buy+bc_util+chargeoff_within_12_mths+delinq_amnt+mo_sin_old_il_acct+mo_sin_old_rev_tl_op+mo_sin_rcnt_rev_tl_op+mo_sin_rcnt_tl+mort_acc+mths_since_recent_bc+num_accts_ever_120_pd+num_actv_bc_tl+num_actv_rev_tl+num_bc_sats+num_bc_tl+num_il_tl+num_op_rev_tl+num_rev_accts+num_rev_tl_bal_gt_0+num_sats+num_tl_120dpd_2m+num_tl_30dpd+num_tl_90g_dpd_24m+num_tl_op_past_12m+pct_tl_nvr_dlq+percent_bc_gt_75+pub_rec_bankruptcies+tax_liens+tot_hi_cred_lim+total_bal_ex_mort+total_bc_limit+total_il_high_credit_limit,
+                         data=train,
+                         do.trace=T, 
+                         ntree=100,
+                         importance=TRUE,
+                         cp =0.1428844,
+                         type="class")
+```
+
+
+
+```{r}
+modelFi2 <- randomForest(train$grade ~ int_rate+loan_amnt+installment+term+funded_amnt_inv+funded_amnt+annual_inc+loan_status+issue_d+dti+open_acc+revol_bal+total_acc+out_prncp+out_prncp_inv+total_pymnt+total_pymnt_inv+total_rec_prncp+total_rec_int+last_pymnt_amnt+max_bal_bc+all_util+total_rev_hi_lim+total_bal_il+avg_cur_bal+bc_open_to_buy+bc_util+mo_sin_old_rev_tl_op+mths_since_recent_bc+num_actv_rev_tl+num_rev_accts+num_rev_tl_bal_gt_0+num_sats+percent_bc_gt_75+tot_hi_cred_lim+total_bal_ex_mort+total_bc_limit+total_il_high_credit_limit,
+                         data=train,
+                         do.trace=T, 
+                         ntree=100,
+                         importance=TRUE,
+                         cp =0.1413706,
+                         type="class")
+```
+
+```{r}
+plot(modelFit,main='Taxa de Erro RandomForest')
+```
+
+```{r}
+plot(modelFi2,main='Taxa de Erro RandomForest')
+
+```
+
+
+```{r}
+importance(modelFit)
+varImpPlot(modelFit, sort=TRUE, n.var=min(15, nrow(modelFit$importance)),
+           type=NULL, class=NULL, scale=TRUE,pch=16,col='green', 
+           main=deparse(substitute('Gráfico de importância de variáveis')))
+```
+
+```{r}
+print(modelFit)
+```
+
+```{r}
+table(train$grade)
+```
+
+#predição através da base de treino
+```{r}
+train$resultado1<-predict(modelFi2)
+```
+
+#Predição através do modelo ModelFit2
+```{r}
+teste$resultado1<-predict(modelFi2, newdata = teste)
+
+```
+
+```{r}
+View(teste)
+```
+
+
+```{r}
+print(modelFi2)
+```
+
+```{r}
+confusionMatrix(train$resultado1, train$grade)
+confusionMatrix( teste$resultado1, teste$grade)
+
+```
+
+
+#Modelo com NaiveBayes
+
+Carregando a biblioteca e1071
+```{r}
+library(e1071)
+```
+
+
+```{r}
+
+Naive_Bayes_Model<-naiveBayes(grade ~ int_rate+loan_amnt+installment+term+funded_amnt_inv+funded_amnt+annual_inc+loan_status+issue_d+dti+open_acc+revol_bal+total_acc+out_prncp+out_prncp_inv+total_pymnt+total_pymnt_inv+total_rec_prncp+total_rec_int+last_pymnt_amnt+max_bal_bc+all_util+total_rev_hi_lim+total_bal_il+avg_cur_bal+bc_open_to_buy+bc_util+mo_sin_old_rev_tl_op+mths_since_recent_bc+num_actv_rev_tl+num_rev_accts+num_rev_tl_bal_gt_0+num_sats+percent_bc_gt_75+tot_hi_cred_lim+total_bal_ex_mort+total_bc_limit+total_il_high_credit_limit,
+                         data=train
+                         )
+```
+
+
+```{r}
+print(Naive_Bayes_Model)
+```
+
+
+#Predicao do Modelo de acordo com a base de treino
+```{r}
+train$naive1 <- predict(Naive_Bayes_Model,newdata=train, type = "class")
+View(train)
+
+```
+
+#Matriz de confusão Naive1
+```{r}
+
+confusionMatrix(train$naive1, train$grade)
+
+```
+
+```{r}
+LoanStats_2019Q1_2<- LoanStats_2019Q1[,-c(1,2)]
+```
+
+
+#Predicao do Modelo de acordo com a base de teste
+```{r}
+teste$naive2 <- predict(Naive_Bayes_Model,newdata=teste, type = "class")
+```
+
+
+```{r}
+
+confusionMatrix(teste$naive2,teste$grade)
+
+
+```
+
